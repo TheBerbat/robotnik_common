@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.5)
+
+project(robotnik_common NONE)
+
+find_package(ament_cmake_core REQUIRED)
+find_package(ament_cmake_python REQUIRED)
+
+ament_python_install_package(robotnik_common)
