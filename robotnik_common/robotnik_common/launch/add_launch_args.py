@@ -27,6 +27,25 @@ from launch.substitutions import EnvironmentVariable
 from launch.substitutions import LaunchConfiguration
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from dataclasses import dataclass, field
+
+
+@dataclass
+class ExtendedArgument:
+    """ Extended Arguments item dataclass """
+    name: str
+    default_value: str
+    description: str
+    # Use environment variable
+    use_env: bool = field(default=True)
+    # Environment variable name to use
+    environment: str = field(default=None)
+
+    def __post_init__(self):
+        if not self.environment:
+            self.environment = self.name.upper()
+
+
 
 
 def add_launch_args(
