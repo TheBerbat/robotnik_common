@@ -56,7 +56,7 @@ def add_launch_args(
             )
         )
 
-    # Get the launch configuration variables
-    ret[param[0]] = LaunchConfiguration(param[0])
+        # Get the launch configuration variables
+        ret[param[0]] = LaunchConfiguration(param[0])
 
     return ret
