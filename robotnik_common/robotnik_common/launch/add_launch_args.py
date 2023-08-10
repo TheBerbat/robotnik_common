@@ -23,14 +23,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import launch
 from launch.substitutions import EnvironmentVariable
 from launch.substitutions import LaunchConfiguration
+from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 
 
 def add_launch_args(
-    ld: launch.LaunchDescription,
+    ld: LaunchDescription,
     params: list[
         tuple[
             str,
