@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Robotnik Automation S.L.L.
+# Copyright (c) 2023, Robotnik Automation S.L.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,19 +24,39 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import launch
+from launch.substitutions import EnvironmentVariable
+from launch.substitutions import LaunchConfiguration
+from launch.actions import DeclareLaunchArgument
 
-def add_launch_args(ld : launch.LaunchDescription, params : list[tuple[str, str, str]]): # name, description, default_value
 
-  ret={}
+def add_launch_args(
+    ld: launch.LaunchDescription,
+    params: list[
+        tuple[
+            str,
+            str,
+            str
+        ]
+    ]
+):
+    # name, description, default_value
 
-  for param in params:
-    # Declare the launch options
-    ld.add_action(launch.actions.DeclareLaunchArgument(
-      name=param[0], description=param[1],
-      default_value=launch.substitutions.EnvironmentVariable(param[0].upper(), default_value=param[2]),
-    ))
+    ret = {}
+
+    for param in params:
+        # Declare the launch options
+        ld.add_action(
+            DeclareLaunchArgument(
+                name=param[0],
+                description=param[1],
+                default_value=EnvironmentVariable(
+                    param[0].upper(),
+                    default_value=param[2],
+                ),
+            )
+        )
 
     # Get the launch configuration variables
-    ret[param[0]] = launch.substitutions.LaunchConfiguration(param[0])
+    ret[param[0]] = LaunchConfiguration(param[0])
 
-  return ret
+    return ret
