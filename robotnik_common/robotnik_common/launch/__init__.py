@@ -15,3 +15,4 @@
 from .rewritten_yaml import RewrittenYaml
 from .add_launch_args import add_launch_args
 from .add_launch_args import ExtendedArgument
+from .add_launch_args import AddArgumentParser
