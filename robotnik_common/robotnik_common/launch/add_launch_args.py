@@ -46,6 +46,55 @@ class ExtendedArgument:
             self.environment = self.name.upper()
 
 
+class AddArgumentParser():
+    """ Add the argument with environment variable """
+
+    def __init__(
+        self,
+        ld: LaunchDescription,
+    ):
+        self._arg_list = []
+        self._ld = ld
+
+    def add_arg(
+        self,
+        arg: ExtendedArgument,
+    ):
+        self._arg_list.append(arg)
+
+    def __add_launch_arg(
+        self,
+        arg: ExtendedArgument,
+    ):
+        if not arg.environment:
+            arg.environment = arg.name.upper()
+        if arg.use_env:
+            default_value = EnvironmentVariable(
+                name=arg.environment,
+                default_value=arg.default_value,
+            )
+            arg = DeclareLaunchArgument(
+                name=arg.name,
+                description=arg.description,
+                default_value=default_value,
+            )
+        else:
+            arg = DeclareLaunchArgument(
+                name=arg.name,
+                description=arg.description,
+                default_value=arg.default_value,
+            )
+        self._ld.add_action(arg)
+        pass
+
+    def process_arg(
+        self,
+    ):
+        params = {}
+        for arg in self._arg_list:
+            self.__add_launch_arg(arg)
+            params[arg.name] = LaunchConfiguration(arg.name)
+        return params
 
 
 def add_launch_args(
