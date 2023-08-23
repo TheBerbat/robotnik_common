@@ -1,4 +1,4 @@
-# Copyright (c) 2023, Robotnik Automation S.L.L.
+# Copyright (c) 2023, Robotnik Automation S.L.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -23,20 +23,108 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import launch
+from launch.substitutions import EnvironmentVariable
+from launch.substitutions import LaunchConfiguration
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument
+from dataclasses import dataclass, field
 
-def add_launch_args(ld : launch.LaunchDescription, params : list[tuple[str, str, str]]): # name, description, default_value
 
-  ret={}
+@dataclass
+class ExtendedArgument:
+    """ Extended Arguments item dataclass """
+    name: str
+    default_value: str
+    description: str
+    # Use environment variable
+    use_env: bool = field(default=True)
+    # Environment variable name to use
+    environment: str = field(default=None)
 
-  for param in params:
-    # Declare the launch options
-    ld.add_action(launch.actions.DeclareLaunchArgument(
-      name=param[0], description=param[1],
-      default_value=launch.substitutions.EnvironmentVariable(param[0].upper(), default_value=param[2]),
-    ))
+    def __post_init__(self):
+        if not self.environment:
+            self.environment = self.name.upper()
 
-    # Get the launch configuration variables
-    ret[param[0]] = launch.substitutions.LaunchConfiguration(param[0])
 
-  return ret
+class AddArgumentParser():
+    """ Add the argument with environment variable """
+
+    def __init__(
+        self,
+        ld: LaunchDescription,
+    ):
+        self._arg_list = []
+        self._ld = ld
+
+    def add_arg(
+        self,
+        arg: ExtendedArgument,
+    ):
+        self._arg_list.append(arg)
+
+    def __add_launch_arg(
+        self,
+        arg: ExtendedArgument,
+    ):
+        if not arg.environment:
+            arg.environment = arg.name.upper()
+        if arg.use_env:
+            default_value = EnvironmentVariable(
+                name=arg.environment,
+                default_value=arg.default_value,
+            )
+            arg = DeclareLaunchArgument(
+                name=arg.name,
+                description=arg.description,
+                default_value=default_value,
+            )
+        else:
+            arg = DeclareLaunchArgument(
+                name=arg.name,
+                description=arg.description,
+                default_value=arg.default_value,
+            )
+        self._ld.add_action(arg)
+        pass
+
+    def process_arg(
+        self,
+    ):
+        params = {}
+        for arg in self._arg_list:
+            self.__add_launch_arg(arg)
+            params[arg.name] = LaunchConfiguration(arg.name)
+        return params
+
+
+def add_launch_args(
+    ld: LaunchDescription,
+    params: list[
+        tuple[
+            str,
+            str,
+            str
+        ]
+    ]
+):
+    # name, description, default_value
+
+    ret = {}
+
+    for param in params:
+        # Declare the launch options
+        ld.add_action(
+            DeclareLaunchArgument(
+                name=param[0],
+                description=param[1],
+                default_value=EnvironmentVariable(
+                    param[0].upper(),
+                    default_value=param[2],
+                ),
+            )
+        )
+
+        # Get the launch configuration variables
+        ret[param[0]] = LaunchConfiguration(param[0])
+
+    return ret
